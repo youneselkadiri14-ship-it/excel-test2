@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel Intermédiaire — UpSkills</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --nv:#131929;--or:#F97316;--pp:#6366F1;--gn:#22a65f;--gnl:#e8f5ee;--w:#fff;
+            --g2:#e5e7eb;--g5:#6b7280;--sh:0 12px 32px rgba(0,0,0,.1);--sp:0.4s cubic-bezier(.34,1.56,.64,1);
+        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh}
+
+        .header{background:var(--nv);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.2)}
+        .logo{display:flex;align-items:center;gap:8px}.logo-icon{width:30px;height:30px;background:linear-gradient(135deg,var(--or),var(--pp));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}.logo-text{font-family:'Syne',sans-serif;font-weight:700;font-size:17px;color:var(--w)}.logo-text span{color:var(--or)}
+        .header-progress{display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,.55)}.header-bar{width:100px;height:4px;background:rgba(255,255,255,.12);border-radius:2px;overflow:hidden}.header-fill{height:100%;background:var(--or);border-radius:2px;transition:width .5s ease}
+
+        .hero{background:var(--nv);padding:44px 28px 52px;position:relative;overflow:hidden}
+        .hero::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;background:radial-gradient(circle,rgba(249,115,22,.12) 0%,transparent 70%)}
+        .hero-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.2);color:var(--or);font-size:10px;font-weight:600;padding:4px 12px;border-radius:16px;margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px;position:relative;z-index:1;animation:fu .6s ease both}@keyframes fu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+        .hero h1{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--w);line-height:1.12;margin-bottom:10px;max-width:520px;position:relative;z-index:1;animation:fu .6s ease .1s both}.hero h1 em{font-style:normal;color:var(--or)}
+        .hero p{color:rgba(255,255,255,.45);font-size:14px;max-width:420px;position:relative;z-index:1;animation:fu .6s ease .2s both}
+        .hero-stats{display:flex;gap:32px;margin-top:22px;position:relative;z-index:1;animation:fu .6s ease .3s both}.hero-stat-num{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:var(--w)}.hero-stat-label{font-size:11px;color:rgba(255,255,255,.35);text-transform:uppercase}
+
+        .content{max-width:1100px;margin:0 auto;padding:36px 28px 60px}
+        .section-title{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;color:var(--nv);margin-bottom:20px}
+        .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:36px}
+        .card{background:var(--w);border:1px solid var(--g2);border-radius:16px;padding:22px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;animation:ci .5s var(--sp) both}@keyframes ci{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+        .card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--g2);transition:background .25s}
+        .card:hover{border-color:var(--pp);box-shadow:var(--sh);transform:translateY(-3px)}.card:hover::before{background:var(--pp)}
+        .card.done::before{background:var(--gn)}
+        .card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}.card-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}.card-status{font-size:10px;font-weight:500;padding:3px 8px;border-radius:12px}
+        .card-status.done{background:var(--gnl);color:#1a7a4a}.card-status.progress{background:#fff8e6;color:#b07800}.card-status.new{background:#e8f0fe;color:#1a56db}
+        .card-num{font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;font-weight:500}.card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--nv);margin-bottom:4px}.card-desc{font-size:12px;color:var(--g5);line-height:1.5;margin-bottom:14px}
+        .card-footer{display:flex;align-items:center;justify-content:space-between}.card-meta{font-size:11px;color:#9ca3af}.card-btn{padding:7px 14px;background:var(--nv);color:var(--w);border:none;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}.card-btn:hover{background:var(--or)}
+        .summary{background:var(--nv);border-radius:20px;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}.summary h3{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--w);margin-bottom:6px}.summary p{font-size:12px;color:rgba(255,255,255,.4)}.summary-stats{display:flex;gap:28px}.summary-stat-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--or);text-align:center}.summary-stat-label{font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase}
+
+        /* Intro overlay */
+        .intro-overlay{display:none;position:fixed;inset:0;background:rgba(19,25,41,.92);backdrop-filter:blur(12px);z-index:400;align-items:center;justify-content:center}
+        .intro-overlay.show{display:flex}
+        .intro-card{background:var(--w);border-radius:20px;overflow:hidden;max-width:460px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,.3);animation:introIn .5s var(--sp)}@keyframes introIn{from{opacity:0;transform:scale(.85) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+        .intro-top{background:linear-gradient(135deg,var(--nv),#1a2235);padding:36px 32px 28px;text-align:center;position:relative;overflow:hidden}
+        .intro-top::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:rgba(249,115,22,.1);border-radius:50%}
+        .intro-icon{font-size:48px;margin-bottom:12px;position:relative;z-index:1}
+        .intro-top h2{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--w);margin-bottom:6px;position:relative;z-index:1}
+        .intro-top .lesson-num{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);margin-bottom:4px;position:relative;z-index:1}
+        .intro-bottom{background:var(--w);padding:24px 32px 28px;text-align:center}
+        .intro-bottom p{font-size:13px;color:var(--g5);line-height:1.6;margin-bottom:8px}
+        .intro-meta{font-size:11px;color:#9ca3af;margin-bottom:20px}
+        .intro-btn{padding:12px 32px;background:var(--or);color:var(--w);border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:8px;transition:all .2s}.intro-btn:hover{background:#e8650a;transform:translateY(-2px)}.intro-btn:active{transform:scale(.97)}
+
+        .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--nv);color:var(--w);padding:10px 20px;border-radius:8px;font-size:12px;z-index:999;transition:all var(--sp);opacity:0;box-shadow:0 4px 12px rgba(0,0,0,.2)}.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+        @media(max-width:800px){.hero h1{font-size:26px}.cards{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo"><div class="logo-icon">📊</div><span class="logo-text">Up<span>Skills</span></span></div>
+        <div class="header-progress"><span id="prog-text">0 / 7 leçons</span><div class="header-bar"><div class="header-fill" id="prog-fill" style="width:0%"></div></div></div>
+    </header>
+    <div class="hero">
+        <div class="hero-badge">✦ Cours Intermédiaire</div>
+        <h1>Maîtriser <em>Excel</em><br>niveau avancé</h1>
+        <p>7 leçons interactives avec un simulateur Excel complet. Progressez à votre rythme.</p>
+        <div class="hero-stats"><div><div class="hero-stat-num">7</div><div class="hero-stat-label">Leçons</div></div><div><div class="hero-stat-num">~120</div><div class="hero-stat-label">Minutes</div></div></div>
+    </div>
+    <div class="content">
+        <div class="section-title">Programme complet</div>
+        <div class="cards" id="cards"></div>
+        <div class="summary">
+            <div><h3>Votre progression</h3><p>Complétez les leçons à votre rythme. Votre avancement est sauvegardé.</p></div>
+            <div class="summary-stats"><div><div class="summary-stat-num" id="sum-done">0</div><div class="summary-stat-label">Terminées</div></div><div><div class="summary-stat-num" id="sum-rem">7</div><div class="summary-stat-label">Restantes</div></div></div>
+        </div>
+    </div>
+
+    <div class="intro-overlay" id="intro-overlay">
+        <div class="intro-card">
+            <div class="intro-top">
+                <div class="lesson-num" id="intro-num">Leçon 01</div>
+                <div class="intro-icon" id="intro-icon">🖥️</div>
+                <h2 id="intro-title">Interface & Classeur</h2>
+            </div>
+            <div class="intro-bottom">
+                <p id="intro-desc">Découvrez l'interface Excel, la gestion des fichiers et la protection par mot de passe.</p>
+                <div class="intro-meta" id="intro-meta">⏱ 12 min · 9 étapes</div>
+                <button class="intro-btn" id="intro-play-btn">▶ Commencer</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+<script>
+const lessons = [
+    {id:0,icon:'🖥️',num:'Leçon 01',title:'Interface & Classeur',desc:'Découvrez l\'interface Excel, la gestion des fichiers et la protection par mot de passe.',duration:'12 min',stepCount:9,completionMsg:'Vous connaissez l\'interface Excel et savez enregistrer et protéger un classeur.',file:'lecon1.html'},
+    {id:1,icon:'📄',num:'Leçon 02',title:'Feuilles & Saisie',desc:'Gérez les feuilles de calcul et maîtrisez la saisie, modification et suppression de données.',duration:'14 min',stepCount:10,completionMsg:'Vous maîtrisez les feuilles et la saisie de données.',file:'lecon2.html'},
+    {id:2,icon:'📋',num:'Leçon 03',title:'Presse-papiers, Séries & Lignes/Colonnes',desc:'Copiez, coupez, créez des séries automatiques et gérez lignes et colonnes.',duration:'14 min',stepCount:12,completionMsg:'Vous maîtrisez le presse-papiers, les séries et la gestion des lignes/colonnes.',file:'lecon3.html'},
+    {id:3,icon:'🔢',num:'Leçon 04',title:'Formules & Références',desc:'Construisez des formules, maîtrisez les priorités et les références absolues/relatives.',duration:'16 min',stepCount:14,completionMsg:'Vous savez créer des formules et utiliser les références.',file:'lecon4.html'},
+    {id:4,icon:'📊',num:'Leçon 05',title:'Fonctions',desc:'Utilisez SOMME, MOYENNE, MAX, MIN, SI, SI imbriqué, ET, OU.',duration:'18 min',stepCount:16,completionMsg:'Vous maîtrisez les fonctions essentielles d\'Excel.',file:'lecon5.html'},
+    {id:5,icon:'🎨',num:'Leçon 06',title:'Mise en Forme',desc:'Appliquez polices, couleurs, bordures et formats conditionnels.',duration:'12 min',stepCount:10,completionMsg:'Vous savez mettre en forme vos tableaux.',file:'lecon6.html'},
+    {id:6,icon:'📈',num:'Leçon 07',title:'Graphiques',desc:'Créez et personnalisez des graphiques à partir de vos données.',duration:'12 min',stepCount:10,completionMsg:'Vous savez créer des graphiques percutants.',file:'lecon7.html'}
+];
+
+let selectedLesson = null;
+
+function getProgress(){try{return JSON.parse(localStorage.getItem('xl_progress_v3')||'{}')}catch(e){return{}}}
+
+const grid = document.getElementById('cards');
+const progress = getProgress();
+let done = 0;
+lessons.forEach((l,i)=>{
+    const pct = progress[l.id]||0, isDone = pct>=100;
+    if(isDone) done++;
+    const card = document.createElement('div');
+    card.className = 'card'+(isDone?' done':'');
+    card.style.animationDelay = (i*0.04)+'s';
+    let sc='new', st='Nouveau';
+    if(isDone){sc='done';st='✓ Terminée'}else if(pct>0){sc='progress';st='▶ En cours'}
+    card.innerHTML = `
+        <div class="card-top"><div class="card-icon">${l.icon}</div><span class="card-status ${sc}">${st}</span></div>
+        <div class="card-num">${l.num}</div><div class="card-title">${l.title}</div><div class="card-desc">${l.desc}</div>
+        <div class="card-footer"><span class="card-meta">⏱ ${l.duration} · ${l.stepCount} étapes</span><button class="card-btn">${isDone?'↺ Revoir':pct>0?'Continuer →':'Commencer →'}</button></div>`;
+    card.addEventListener('click',()=>{
+        selectedLesson = l;
+        document.getElementById('intro-num').textContent = l.num;
+        document.getElementById('intro-icon').textContent = l.icon;
+        document.getElementById('intro-title').textContent = l.title;
+        document.getElementById('intro-desc').textContent = l.desc;
+        document.getElementById('intro-meta').textContent = '⏱ '+l.duration+' · '+l.stepCount+' étapes';
+        document.getElementById('intro-overlay').classList.add('show');
+    });
+    grid.appendChild(card);
+});
+document.getElementById('prog-text').textContent = done+' / 7 leçons';
+document.getElementById('prog-fill').style.width = (done/7*100)+'%';
+document.getElementById('sum-done').textContent = done;
+document.getElementById('sum-rem').textContent = 7-done;
+
+document.getElementById('intro-play-btn').addEventListener('click',function(){
+    document.getElementById('intro-overlay').classList.remove('show');
+    if(selectedLesson && selectedLesson.file){
+        window.location.href = selectedLesson.file;
+    }
+});
+
+function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._tid);
+    t._tid = setTimeout(()=>t.classList.remove('show'),2500);
+}
+</script>
+</body>
+</html>

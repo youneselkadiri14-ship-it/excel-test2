@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leçon 1 — Interface & Classeur</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root{--xl:#217346;--xld:#1a5c38;--gn:#22a65f;--gnl:#e8f5ee;--gnd:#1a7a4a;--nv:#131929;--or:#F97316;--pp:#6366F1;--sh:0 8px 24px rgba(0,0,0,.12);--sp:0.4s cubic-bezier(.34,1.56,.64,1)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;background:#e8ecf1;height:100vh;display:flex;flex-direction:column;overflow:hidden;user-select:none;position:relative}
+
+        .titlebar{background:var(--xl);color:#fff;padding:0 10px;height:28px;display:flex;align-items:center;justify-content:space-between;font-size:10px;flex-shrink:0}
+        .titlebar-l{display:flex;align-items:center;gap:6px}.titlebar-logo{width:12px;height:12px;background:#fff;border-radius:1px;display:flex;align-items:center;justify-content:center;font-size:7px;color:var(--xl);font-weight:700}.titlebar-name{font-weight:400}
+        .titlebar-btns{display:flex}.titlebar-btns span{width:26px;height:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px}.titlebar-btns span:hover{background:rgba(255,255,255,.1)}
+
+        .menubar{background:#f0f0f0;border-bottom:1px solid #d0d0d0;height:24px;display:flex;align-items:center;padding:0 4px;font-size:11px;flex-shrink:0;position:relative;z-index:100}
+        .menubar-item{padding:3px 10px;cursor:pointer;border-radius:2px;color:#333;position:relative}.menubar-item:hover{background:#d8d8d8}.menubar-item.open{background:#d0d0d0}
+        .dropdown{display:none;position:absolute;top:100%;left:0;background:#fff;border:1px solid #c0c0c0;box-shadow:var(--sh);min-width:200px;padding:3px 0;border-radius:2px;z-index:200}
+        .dropdown.show{display:block;animation:dropIn .1s ease}@keyframes dropIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
+        .dropdown-item{padding:5px 18px 5px 24px;font-size:11px;color:#333;cursor:pointer;white-space:nowrap}.dropdown-item:hover{background:#e8f0fe}
+
+        .ribbon{flex-shrink:0;background:#fff;border-bottom:1px solid #d0d0d0}
+        .ribbon-tabs{display:flex;padding-left:6px;background:#fff}
+        .ribbon-tab{padding:5px 10px;font-size:10.5px;color:#555;cursor:pointer;border-bottom:2px solid transparent;background:transparent;font-family:inherit;border:none;outline:none}.ribbon-tab.active{color:var(--xl);border-bottom-color:var(--xl);font-weight:600}
+        .ribbon-groups{display:flex;padding:4px 8px 6px;background:#f8f8f8;border-top:1px solid #e0e0e0;align-items:flex-start}
+        .ribbon-group{display:flex;flex-direction:column;align-items:center;padding:0 6px;border-right:1px solid #e0e0e0}.ribbon-group:last-child{border-right:none}.ribbon-group-label{font-size:8px;color:#888;margin-top:2px}
+        .ribbon-group-row{display:flex;align-items:center;gap:1px;justify-content:center}
+        .ribbon-btn{width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:2px;font-size:11px;color:#444;border:1px solid transparent;background:transparent}.ribbon-btn:hover{background:#e0e0e0;border-color:#ccc}
+        .ribbon-dropdown{display:flex;align-items:center;justify-content:space-between;padding:2px 5px;border:1px solid #c0c0c0;background:#fff;border-radius:2px;font-size:9.5px;cursor:pointer;height:20px}
+        .ribbon-sep{width:1px;background:#d0d0d0;margin:0 3px;align-self:stretch}
+
+        .fxbar{display:flex;align-items:center;background:#fff;border-bottom:1px solid #d0d0d0;height:22px;flex-shrink:0}
+        .fx-name{width:55px;border-right:1px solid #d0d0d0;text-align:center;font-size:10px;font-weight:500;color:#333;height:100%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:0.1s}.fx-name:hover{background:#f0f0f0}
+        .fx-name.target-zone{background:#fffde7!important;outline:2px solid #f0a500!important;animation:glow .7s infinite alternate;z-index:3}
+        .fx-fx{font-size:9px;color:#888;padding:0 3px;font-style:italic;cursor:pointer;transition:0.1s}.fx-fx:hover{color:#333}
+        .fx-fx.target-fx{background:#fffde7!important;outline:2px solid #f0a500!important;animation:glow .7s infinite alternate}
+        .fx-input{flex:1;font-size:10px;padding:0 5px;font-family:Consolas,monospace;color:#333;overflow:hidden;cursor:pointer;transition:0.1s}.fx-input:hover{background:#f8f8f8}
+        .fx-input.target-fx{background:#fffde7!important;outline:2px solid #f0a500!important;animation:glow .7s infinite alternate}
+        .ribbon-tab.target-tab{background:#fffde7!important;outline:2px solid #f0a500!important;animation:glow .7s infinite alternate;border-bottom-color:#f0a500!important}
+        .menubar-item.target-menu{background:#fffde7!important;outline:2px solid #f0a500!important;animation:glow .7s infinite alternate}
+        @keyframes glow{from{background:#fffde7}to{background:#fff8cc}}
+
+        .grid-wrap{flex:1;overflow:auto;background:#fff;margin:2px;border:1px solid #d8d8d8}
+        .grid-wrap table{border-collapse:collapse}
+        .grid-wrap th,.grid-wrap td{border:1px solid #d4d4d4;min-width:60px;height:22px;font-size:11px;padding:0 3px}
+        .grid-wrap th.ch{background:#f3f3f3;color:#777;font-size:9px;position:sticky;top:0;text-align:center;font-weight:400}
+        .grid-wrap th.rh{background:#f3f3f3;color:#777;font-size:9px;width:30px;text-align:center;font-weight:400}
+        .grid-wrap td.dc{cursor:cell;white-space:nowrap;overflow:hidden;transition:0.1s}
+        .grid-wrap td.dc.focus{outline:2px solid #1a73e8;outline-offset:-1px;z-index:2;background:#fff}
+        .grid-wrap td.dc.target{background:#fffde7!important;outline:2px solid #f0a500!important;z-index:3;animation:glow .7s infinite alternate}
+        .grid-wrap td.dc.correct{background:var(--gnl)!important;outline:2px solid var(--gn)!important;animation:pop .3s ease}@keyframes pop{0%{transform:scale(1.04)}100%{transform:scale(1)}}
+
+        .sheet-tab-bar{background:#e8e8e8;border-top:1px solid #d0d0d0;height:26px;display:flex;align-items:flex-end;padding:0 4px;flex-shrink:0;gap:1px}
+        .sheet-tab{padding:3px 14px;background:#d8d8d8;border:1px solid #c8c8c8;border-bottom:none;border-radius:3px 3px 0 0;cursor:pointer;font-size:10px;color:#666}.sheet-tab.active{background:#fff;color:#000;font-weight:500}
+        .sheet-tab-add{width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:#666;border-radius:3px;margin-bottom:2px}.sheet-tab-add:hover{background:#d0d0d0}
+        .statusbar{background:#f0f0f0;border-top:1px solid #e0e0e0;height:18px;display:flex;align-items:center;justify-content:space-between;padding:0 6px;font-size:8px;color:#888;flex-shrink:0}
+
+        .instr-bar{background:#f8f9fb;border-top:1px solid #d0d0d0;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;min-height:52px;z-index:50}
+        .instr-back{width:28px;height:28px;border:1px solid #d0d0d0;background:#fff;border-radius:4px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:0.1s;flex-shrink:0}.instr-back:hover{background:#e8e8e8}
+        .voice-text{font-size:12px;color:#333;flex:2;line-height:1.5;min-width:0}.voice-text strong{color:#000}
+        .action-box{background:#e8f0fe;border:1px solid #d0e0f8;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:600;color:#1a1a2e;white-space:nowrap}
+        .hint-text{font-size:10px;color:#9a5c00;background:#fff7ed;border:1px solid #fde0c0;border-radius:6px;padding:6px 10px;white-space:nowrap}
+        .dots{display:flex;gap:3px}.dot{width:5px;height:5px;border-radius:50%;background:#ccc;transition:all .3s}.dot.on{background:var(--gn);transform:scale(1.3)}.dot.done{background:var(--gn);opacity:.5}
+        .fb{font-size:10px;font-weight:500;padding:4px 8px;border-radius:4px;display:none}.fb.show{display:block}.fb.ok{background:var(--gnl);color:var(--gnd)}.fb.err{background:#fef2f2;color:#dc2626}
+
+        .dlg-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;align-items:center;justify-content:center}
+        .dlg-overlay.show{display:flex}
+        .dlg-win{background:#fff;border-radius:6px;box-shadow:0 20px 48px rgba(0,0,0,.25);width:650px;animation:modalIn .2s var(--sp)}
+        @keyframes modalIn{from{opacity:0;transform:scale(.94) translateY(-8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+        .dlg-win-top{display:flex;align-items:center;padding:8px 12px;border-bottom:1px solid #e0e0e0;gap:6px}
+        .dlg-nav-btn{width:28px;height:22px;border:1px solid #c0c0c0;background:#f0f0f0;border-radius:2px;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center}
+        .dlg-path{flex:1;height:22px;border:1px solid #c0c0c0;background:#fff;padding:0 8px;font-size:10px;display:flex;align-items:center;color:#555;border-radius:2px}
+        .dlg-win-main{display:flex;height:260px}.dlg-sidebar{width:160px;background:#fafafa;border-right:1px solid #e0e0e0;padding:8px 0;font-size:10px}
+        .dlg-sidebar .folder{padding:5px 12px 5px 24px;cursor:pointer;color:#333;display:flex;align-items:center;gap:5px}.dlg-sidebar .folder:hover{background:#e8f0fe}
+        .dlg-filelist{flex:1;background:#fff;padding:4px;overflow-y:auto;font-size:10px}
+        .dlg-filelist .file{display:flex;align-items:center;gap:6px;padding:3px 8px;cursor:pointer}.dlg-filelist .file:hover{background:#e8f0fe}
+        .dlg-win-bottom{padding:10px 12px;border-top:1px solid #e0e0e0;background:#fafafa;display:flex;flex-direction:column;gap:8px}
+        .dlg-row{display:flex;align-items:center;gap:8px}.dlg-row label{font-size:10px;color:#555;width:75px;text-align:right}
+        .dlg-row input{flex:1;height:22px;border:1px solid #c0c0c0;padding:0 6px;font-size:10px;border-radius:2px;outline:none;font-family:'Inter',sans-serif}
+        .dlg-row select{height:22px;border:1px solid #c0c0c0;font-size:10px;border-radius:2px;font-family:'Inter',sans-serif}
+        .dlg-btns{display:flex;justify-content:flex-end;gap:6px;padding-top:4px}
+        .dlg-btn{padding:5px 16px;border-radius:3px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;border:1px solid transparent}.dlg-btn.primary{background:var(--xl);color:#fff}.dlg-btn.primary:hover{background:var(--xld)}.dlg-btn.cancel{background:#e8e8e8;color:#333}.dlg-btn.cancel:hover{background:#d0d0d0}
+        .dlg-modal{background:#fff;border-radius:8px;box-shadow:0 20px 48px rgba(0,0,0,.2);min-width:380px;animation:modalIn .2s var(--sp)}
+        .dlg-modal-title{padding:12px 16px;border-bottom:1px solid #e0e0e0;font-weight:600;font-size:12px;display:flex;justify-content:space-between}
+        .dlg-modal-close{background:none;border:none;cursor:pointer;font-size:14px;color:#888}.dlg-modal-close:hover{color:#333}
+        .dlg-modal-body{padding:20px;display:flex;flex-direction:column;gap:10px}.dlg-modal-body label{font-size:11px;color:#555}.dlg-modal-body input{height:26px;border:1px solid #c0c0c0;padding:0 8px;font-size:11px;border-radius:2px;outline:none;font-family:'Inter',sans-serif}
+        .dlg-modal-btns{display:flex;justify-content:flex-end;gap:6px;padding:12px 16px;border-top:1px solid #e0e0e0;background:#fafafa}
+
+        .done-screen{display:none;position:fixed;inset:0;z-index:500;align-items:center;justify-content:center;background:rgba(19,25,41,0)}
+        .done-screen.visible{display:flex}.done-screen.fade{background:rgba(19,25,41,.88);backdrop-filter:blur(12px);transition:background .5s}
+        .done-card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.35);transform:scale(.85) translateY(30px);opacity:0;max-width:440px;width:90%}
+        .done-card.pop{transform:scale(1) translateY(0);opacity:1;transition:all .5s cubic-bezier(.34,1.56,.64,1)}
+        .done-top{background:linear-gradient(135deg,var(--nv),#1a2235);padding:32px 32px 24px;text-align:center;position:relative;overflow:hidden}
+        .done-top::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:rgba(249,115,22,.08);border-radius:50%}
+        .done-brand{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:20px;z-index:1}.done-brand-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--or),var(--pp));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;opacity:0;transform:scale(0)}.done-brand-icon.pop{opacity:1;transform:scale(1);transition:all .4s cubic-bezier(.34,1.56,.64,1) .3s}
+        .done-brand-text{font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:#fff;opacity:0;transform:translateY(8px)}.done-brand-text span{color:var(--or)}.done-brand-text.show{opacity:1;transform:translateY(0);transition:all .4s ease .45s}
+        .done-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.5);margin-bottom:6px;opacity:0;transform:translateY(8px)}.done-label.show{opacity:1;transform:translateY(0);transition:all .4s ease .55s}
+        .done-top h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;opacity:0;transform:translateY(8px)}.done-top h2.show{opacity:1;transform:translateY(0);transition:all .4s ease .65s}
+        .done-bottom{background:#fff;padding:28px 32px 24px;text-align:center}.done-check{width:44px;height:44px;border-radius:50%;background:var(--gnl);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;opacity:0;transform:scale(0)}.done-check.pop{opacity:1;transform:scale(1);transition:all .4s cubic-bezier(.34,1.56,.64,1) .75s}.done-check svg{width:22px;height:22px;stroke:var(--gn);stroke-width:3;fill:none}
+        .done-bottom p{font-size:13px;color:#6b7280;line-height:1.6;margin-bottom:20px;opacity:0;transform:translateY(8px)}.done-bottom p.show{opacity:1;transform:translateY(0);transition:all .4s ease .9s}
+        .done-bottom button{padding:11px 28px;background:var(--or);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;opacity:0;transform:translateY(8px)}.done-bottom button.show{opacity:1;transform:translateY(0);transition:all .4s ease 1.05s}.done-bottom button:hover{background:#e8650a}
+    </style>
+</head>
+<body>
+
+<div class="titlebar"><div class="titlebar-l"><div class="titlebar-logo">X</div><span class="titlebar-name" id="titlebar-name">Classeur1 — Excel</span></div><div class="titlebar-btns"><span>─</span><span>□</span><span>✕</span></div></div>
+
+<div class="menubar" id="menubar">
+    <div class="menubar-item" data-menu="file">Fichier
+        <div class="dropdown" id="dd-file">
+            <div class="dropdown-item" data-action="saveas">Enregistrer sous...</div>
+            <div class="dropdown-item" data-action="protect">Chiffrer le document...</div>
+        </div>
+    </div>
+    <span class="menubar-item">Accueil</span><span class="menubar-item">Insertion</span>
+    <span class="menubar-item">Mise en page</span><span class="menubar-item">Formules</span>
+    <span class="menubar-item">Données</span><span class="menubar-item">Affichage</span>
+</div>
+
+<div class="ribbon"><div class="ribbon-tabs">
+    <button class="ribbon-tab active" id="tab-accueil">Accueil</button>
+    <button class="ribbon-tab" id="tab-insertion">Insertion</button>
+    <button class="ribbon-tab">Mise en page</button><button class="ribbon-tab">Formules</button>
+</div><div class="ribbon-groups"><div class="ribbon-group"><div class="ribbon-group-row"><div class="ribbon-btn">📋</div><div class="ribbon-btn">✂</div><div class="ribbon-btn">📄</div></div><div class="ribbon-group-label">Presse-papiers</div></div><div class="ribbon-sep"></div><div class="ribbon-group"><div class="ribbon-group-row"><div class="ribbon-dropdown" style="width:75px">Calibri ▾</div><div class="ribbon-dropdown" style="width:32px">11 ▾</div></div><div class="ribbon-group-row"><div class="ribbon-btn"><b>G</b></div><div class="ribbon-btn"><i>I</i></div><div class="ribbon-btn"><u>S</u></div></div><div class="ribbon-group-label">Police</div></div><div class="ribbon-sep"></div><div class="ribbon-group"><div class="ribbon-group-row"><div class="ribbon-btn">⫣</div><div class="ribbon-btn">⫤</div><div class="ribbon-btn">≡</div></div><div class="ribbon-group-label">Alignement</div></div></div></div>
+
+<div class="fxbar">
+    <div class="fx-name" id="namebox">A1</div>
+    <div class="fx-fx" id="fx-label">fx</div>
+    <div class="fx-input" id="fxval"></div>
+</div>
+
+<div class="grid-wrap"><table><thead id="ghead"></thead><tbody id="gbody"></tbody></table></div>
+
+<div class="sheet-tab-bar">
+    <div class="sheet-tab active">Feuil1</div><div class="sheet-tab">Feuil2</div><div class="sheet-tab">Feuil3</div>
+    <div class="sheet-tab-add">+</div>
+</div>
+<div class="statusbar"><span id="status-text">Prêt</span></div>
+
+<div class="instr-bar">
+    <button class="instr-back" id="btn-back" onclick="app.goBack()">◂</button>
+    <div class="voice-text" id="voice"></div>
+    <div class="action-box" id="action"></div>
+    <div class="hint-text" id="hint"></div>
+    <div class="fb" id="fb"></div>
+    <div class="dots" id="dots"></div>
+</div>
+
+<div class="dlg-overlay" id="dlg-saveas"><div class="dlg-win"><div class="dlg-win-top"><button class="dlg-nav-btn">←</button><button class="dlg-nav-btn" style="opacity:0.4">→</button><div class="dlg-path">📁 Ce PC > Documents</div></div><div class="dlg-win-main"><div class="dlg-sidebar"><div class="folder active">📁 Bureau</div><div class="folder">📁 Téléchargements</div><div class="folder">📁 Documents</div></div><div class="dlg-filelist"><div class="file">📄 Rapport_Q1.xlsx</div><div class="file">📄 Budget_2024.xlsx</div></div></div><div class="dlg-win-bottom"><div class="dlg-row"><label>Nom du fichier :</label><input id="saveas-input" placeholder="Classeur1.xlsx" autocomplete="off"></div><div class="dlg-row"><label>Type :</label><select><option>Classeur Excel (*.xlsx)</option></select></div><div class="dlg-btns"><button class="dlg-btn cancel" onclick="app.closeDialog('saveas')">Annuler</button><button class="dlg-btn primary" onclick="app.confirmSaveAs()">Enregistrer</button></div></div></div></div>
+
+<div class="dlg-overlay" id="dlg-protect"><div class="dlg-modal"><div class="dlg-modal-title">Chiffrer le document <button class="dlg-modal-close" onclick="app.closeDialog('protect')">✕</button></div><div class="dlg-modal-body"><label>Mot de passe :</label><input id="protect-pw" type="password" placeholder="Mot de passe" autocomplete="off"><label>Confirmer :</label><input id="protect-cf" type="password" placeholder="Confirmer" autocomplete="off"></div><div class="dlg-modal-btns"><button class="dlg-btn cancel" onclick="app.closeDialog('protect')">Annuler</button><button class="dlg-btn primary" onclick="app.confirmProtect()">OK</button></div></div></div>
+
+<div class="done-screen" id="done-screen"><div class="done-card" id="done-card"><div class="done-top"><div class="done-brand"><div class="done-brand-icon" id="done-brand-icon">📊</div><div class="done-brand-text" id="done-brand-text">Up<span>Skills</span></div></div><div class="done-label" id="done-label">Leçon terminée</div><h2 id="done-title">Interface & Classeur</h2></div><div class="done-bottom"><div class="done-check" id="done-check"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg></div><p id="done-msg">Vous connaissez l'interface Excel et savez enregistrer et protéger un classeur.</p><button id="done-btn" onclick="app.finishLesson()">Retour au menu</button></div></div></div>
+
+<script>
+const app = {
+    step:0,animating:false,stepDone:{},cellData:{},activeCell:'A1',openMenu:null,TOTAL:9,currentAudio:null,
+    steps:[
+        {voice:"Voici la <strong>grille de calcul</strong> d'Excel. Chaque rectangle est une <strong>cellule</strong>, identifiée par sa colonne et sa ligne. <strong>Cliquez sur la cellule A1</strong>, en haut à gauche.",action:'Cliquez sur la cellule A1',hint:'💡 A1 = colonne A, ligne 1. C\'est la première cellule.',type:'click',target:'cell-A1'},
+        {voice:"Regardez le petit rectangle blanc en haut à gauche qui affiche A1. C'est la <strong>zone Nom</strong>. Elle indique toujours la cellule active. <strong>Cliquez sur la zone Nom</strong>.",action:'Cliquez sur la zone Nom',hint:'💡 La zone Nom permet de naviguer rapidement vers n\'importe quelle cellule.',type:'click',target:'namebox'},
+        {voice:"À droite de la zone Nom, la barre marquée <strong>fx</strong> est la <strong>barre de formule</strong>. Elle affiche le contenu de la cellule sélectionnée. <strong>Cliquez sur la barre de formule</strong>.",action:'Cliquez sur la barre de formule',hint:'💡 Quand vous tapez dans une cellule, le texte apparaît aussi dans cette barre.',type:'click',target:'fxbar'},
+        {voice:"Au-dessus se trouve le <strong>ruban</strong>, avec ses onglets : Accueil, Insertion, Mise en page... Chaque onglet affiche des outils différents. <strong>Cliquez sur l'onglet Accueil</strong>.",action:'Cliquez sur l\'onglet Accueil',hint:'💡 Le ruban est votre boîte à outils principale.',type:'click',target:'tab-accueil'},
+        {voice:"Tout en haut, la <strong>barre de menus</strong> contient Fichier, Accueil, Insertion... <strong>Cliquez sur le menu Fichier</strong>.",action:'Cliquez sur Fichier',hint:'💡 Le menu Fichier gère les classeurs.',type:'menu',target:'file'},
+        {voice:"Dans le menu, <strong>cliquez sur Enregistrer sous...</strong> pour donner un nom à votre fichier.",action:'Cliquez sur Enregistrer sous...',hint:'💡 Raccourci : F12',type:'dropdown',target:'saveas'},
+        {voice:"Dans la fenêtre, tapez <strong>Rapport_Ventes</strong> dans le champ Nom du fichier, puis cliquez sur <strong>Enregistrer</strong>.",action:'Tapez Rapport_Ventes → Enregistrer',hint:'💡 La barre de titre changera.',type:'dialog-input',target:'name-save',expected:'Rapport_Ventes'},
+        {voice:"Fichier enregistré. Protégeons-le. <strong>Fichier → Chiffrer le document...</strong>.",action:'Cliquez sur Fichier → Chiffrer le document...',hint:'💡 Sécurisez vos fichiers sensibles.',type:'dropdown',target:'protect'},
+        {voice:"Dans la fenêtre, tapez <strong>excel2024</strong> comme mot de passe, confirmez, puis <strong>OK</strong>.",action:'Mot de passe : excel2024 → OK',hint:'💡 Notez bien votre mot de passe !',type:'dialog-btn',target:'protect-ok'}
+    ],
+
+    init(){this.buildGrid();this.selectCell('A1');this.setupMenus();this.setupDialogs();this.setupClickableInterface();this.updateUI();},
+
+    // ── AUDIO ──
+    playAudio(){
+        // Stop any current audio
+        if(this.currentAudio){this.currentAudio.pause();this.currentAudio=null}
+        // Play new audio
+        const audio = new Audio('audio/L1S'+(this.step+1)+'.mp3');
+        audio.volume = 0.85;
+        this.currentAudio = audio;
+        audio.play().catch(()=>{});
+    },
+    stopAudio(){if(this.currentAudio){this.currentAudio.pause();this.currentAudio=null}},
+
+    buildGrid(){const COLS='ABCDEFGHIJKLMNOP'.split(''),ROWS=30;const thd=document.getElementById('ghead'),tbd=document.getElementById('gbody');let h='<tr><th class="ch" style="width:30px"></th>';COLS.forEach(c=>h+='<th class="ch">'+c+'</th>');h+='</tr>';thd.innerHTML=h;for(let r=1;r<=ROWS;r++){let tr='<tr><th class="rh">'+r+'</th>';COLS.forEach(c=>tr+='<td class="dc" id="c'+c+r+'" data-cell="'+c+r+'" onclick="app.clickCell(\''+c+r+'\')"></td>');tr+='</tr>';tbd.innerHTML+=tr}},
+
+    selectCell(id){document.querySelectorAll('.dc.focus').forEach(t=>t.classList.remove('focus'));const td=document.getElementById('c'+id);if(td){td.classList.add('focus');this.activeCell=id}document.getElementById('namebox').textContent=id;document.getElementById('fxval').textContent=this.cellData[id]||''},
+    clickCell(id){if(this.animating)return;this.selectCell(id);const s=this.steps[this.step];if(!s||s.type!=='click'||s.target!=='cell-'+id)return;if(!this.stepDone[this.step]){this.complete();document.getElementById('c'+id).classList.add('correct');this.feedback('ok','✓ Cellule '+id)}},
+
+    setupClickableInterface(){
+        document.getElementById('namebox').addEventListener('click',(e)=>{e.stopPropagation();this.handleInterfaceClick('namebox','✓ Zone Nom')});
+        document.getElementById('fx-label').addEventListener('click',(e)=>{e.stopPropagation();this.handleInterfaceClick('fxbar','✓ Barre de formule')});
+        document.getElementById('fxval').addEventListener('click',(e)=>{e.stopPropagation();this.handleInterfaceClick('fxbar','✓ Barre de formule')});
+        document.querySelectorAll('.ribbon-tab').forEach(tab=>{tab.addEventListener('click',(e)=>{e.stopPropagation();this.handleInterfaceClick(tab.id,'✓ Onglet '+tab.textContent)})});
+    },
+    handleInterfaceClick(targetId,msg){if(this.animating)return;const s=this.steps[this.step];if(s&&s.type==='click'&&s.target===targetId&&!this.stepDone[this.step]){this.complete();this.feedback('ok',msg)}},
+
+    complete(){this.stepDone[this.step]=true;this.stopAudio();setTimeout(()=>this.advance(),700)},
+    feedback(type,msg){const f=document.getElementById('fb');f.className='fb show '+(type==='ok'?'ok':'err');f.textContent=msg;clearTimeout(f._t);f._t=setTimeout(()=>f.classList.remove('show'),2000)},
+    advance(){if(this.animating)return;this.animating=true;if(this.step<this.TOTAL-1){this.step++;this.updateUI();setTimeout(()=>this.animating=false,300)}else{this.showCompletion()}},
+    goBack(){if(this.animating||this.step<=0)return;this.animating=true;this.stopAudio();this.step--;delete this.stepDone[this.step];this.closeDialog('saveas');this.closeDialog('protect');if(this.openMenu){this.openMenu.classList.remove('show');this.openMenu=null}document.querySelectorAll('.menubar-item.open').forEach(m=>m.classList.remove('open'));this.updateUI();setTimeout(()=>this.animating=false,300)},
+
+    updateUI(){const s=this.steps[this.step];document.getElementById('voice').innerHTML=s.voice;document.getElementById('action').textContent=s.action;document.getElementById('hint').textContent=s.hint;document.getElementById('fb').className='fb';document.getElementById('status-text').textContent='Étape '+(this.step+1)+'/'+this.TOTAL;
+        document.querySelectorAll('.dc.target,.fx-name.target-zone,.fx-fx.target-fx,.fx-input.target-fx,.ribbon-tab.target-tab,.menubar-item.target-menu').forEach(t=>t.classList.remove('target','target-zone','target-fx','target-tab','target-menu'));
+        if(s.type==='click'){if(s.target==='namebox'){document.getElementById('namebox').classList.add('target-zone')}else if(s.target==='fxbar'){document.getElementById('fx-label').classList.add('target-fx');document.getElementById('fxval').classList.add('target-fx')}else if(s.target&&s.target.startsWith('tab-')){document.getElementById(s.target).classList.add('target-tab')}else if(s.target&&s.target.startsWith('cell-')){const td=document.getElementById(s.target.replace('cell-','c'));if(td)td.classList.add('target')}}
+        if(s.type==='menu'){document.querySelector('.menubar-item[data-menu="file"]').classList.add('target-menu')}
+        const dots=document.getElementById('dots');dots.innerHTML='';for(let i=0;i<this.TOTAL;i++){const d=document.createElement('div');d.className='dot'+(i<this.step?' done':'')+(i===this.step?' on':'');dots.appendChild(d)}
+        // Play audio for this step
+        this.playAudio();
+        if(this.stepDone[this.step]&&this.step===this.TOTAL-1)this.showCompletion();
+    },
+
+    setupMenus(){
+        document.querySelectorAll('.menubar-item').forEach(item=>{item.addEventListener('click',function(e){e.stopPropagation();const dd=this.querySelector('.dropdown');if(!dd)return;if(app.openMenu===dd){dd.classList.remove('show');this.classList.remove('open');app.openMenu=null;return}if(app.openMenu){app.openMenu.classList.remove('show');document.querySelector('.menubar-item.open')?.classList.remove('open')}dd.classList.add('show');this.classList.add('open');app.openMenu=dd;const s=app.steps[app.step];if(s&&!app.animating&&!app.stepDone[app.step]&&s.type==='menu'&&this.dataset.menu==='file'){app.complete();app.feedback('ok','✓ Menu Fichier ouvert')}})});
+        document.addEventListener('click',()=>{if(app.openMenu){app.openMenu.classList.remove('show');app.openMenu=null}document.querySelectorAll('.menubar-item.open').forEach(m=>m.classList.remove('open'))});
+        document.querySelectorAll('.dropdown-item').forEach(item=>{item.addEventListener('click',function(e){e.stopPropagation();const action=this.dataset.action;if(app.openMenu){app.openMenu.classList.remove('show');app.openMenu=null}document.querySelectorAll('.menubar-item.open').forEach(m=>m.classList.remove('open'));const s=app.steps[app.step];if(s&&!app.animating&&!app.stepDone[app.step]){if(s.type==='dropdown'&&action==='saveas'){app.complete();app.showDialog('saveas');app.feedback('ok','✓ Enregistrer sous')}else if(s.type==='dropdown'&&action==='protect'){app.complete();app.showDialog('protect');app.feedback('ok','✓ Chiffrer le document')}}})});
+    },
+    setupDialogs(){document.getElementById('saveas-input').addEventListener('keydown',function(e){if(e.key==='Enter')app.confirmSaveAs()});document.getElementById('protect-cf').addEventListener('keydown',function(e){if(e.key==='Enter')app.confirmProtect()})},
+    showDialog(id){document.getElementById('dlg-'+id).classList.add('show')},
+    closeDialog(id){document.getElementById('dlg-'+id).classList.remove('show')},
+    confirmSaveAs(){const val=document.getElementById('saveas-input').value.trim();if(!val){this.feedback('err','Veuillez entrer un nom');return}document.getElementById('titlebar-name').textContent=val+' — Excel';this.closeDialog('saveas');const s=this.steps[this.step];if(s&&s.type==='dialog-input'&&s.expected&&val.toLowerCase()===s.expected.toLowerCase()&&!this.stepDone[this.step]){this.complete();this.feedback('ok','✓ '+val+' enregistré !')}},
+    confirmProtect(){const pw=document.getElementById('protect-pw').value,cf=document.getElementById('protect-cf').value;if(!pw||pw!==cf){this.feedback('err','Les mots de passe ne correspondent pas');return}this.closeDialog('protect');const s=this.steps[this.step];if(s&&s.type==='dialog-btn'&&s.target==='protect-ok'&&!this.stepDone[this.step]){this.complete();this.feedback('ok','✓ Document protégé !')}},
+
+    showCompletion(){const ds=document.getElementById('done-screen'),dc=document.getElementById('done-card'),bi=document.getElementById('done-brand-icon'),bt=document.getElementById('done-brand-text'),cl=document.getElementById('done-label'),dt=document.getElementById('done-title'),cc=document.getElementById('done-check'),dm=document.getElementById('done-msg'),db=document.getElementById('done-btn');ds.classList.add('visible');setTimeout(()=>ds.classList.add('fade'),30);setTimeout(()=>dc.classList.add('pop'),180);setTimeout(()=>bi.classList.add('pop'),480);setTimeout(()=>bt.classList.add('show'),600);setTimeout(()=>cl.classList.add('show'),700);setTimeout(()=>dt.classList.add('show'),780);setTimeout(()=>cc.classList.add('pop'),1000);setTimeout(()=>dm.classList.add('show'),1150);setTimeout(()=>db.classList.add('show'),1280);localStorage.setItem('xl_progress_v3',JSON.stringify({...(JSON.parse(localStorage.getItem('xl_progress_v3')||'{}')),0:100}));this.animating=false},
+    finishLesson(){window.location.href='index.html'}
+};
+app.init();
+</script>
+</body>
+</html>
